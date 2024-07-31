@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Summarization</title>
+    <style>
+        .pre-wrap {
+            white-space: pre-wrap;
+        }
+        .rotating-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #007BFF;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-12" style="text-align: center;">
+        <center><img src="{{ url_for('static', filename='Image/youtube-logo.png') }}" alt="" width="80" height="70"></center>
+        <h1 class="text-4xl font-semibold mb-6">YouTube Video Summarization</h1>
+        <div class="bg-white p-6 rounded shadow">
+            <form action="/" method="POST" onsubmit="showVideoAndSpinner()">
+                <div class="mb-4">
+                    <b>Video URL: </b><input
+                        class="shadow appearance-none border rounded w-280 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="url" size="50"
+                        name="video_url"
+                        id="video_url"
+                        required
+                    />
+                </div>
+                <br>
+                <button
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit">
+                    Transcribe
+                </button><br>
+            </form><br>
+            <div id="video-container" style="display: none;">
+                <iframe id="video-frame" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+            </div>
+            {% if transcription %}
+            <div id="transcription-container">
+                <h2 class="text-2xl font-semibold mb-4" style="text-align: left;">Summarization:</h2>
+                <p id="transcription" style="text-align: left;">{{ transcription }}</p>
+                <form action="/download_pdf" method="POST">
+                    <input type="hidden" name="transcription" value="{{ transcription }}">
+                    <input type="hidden" name="video_url" value="{{ video_url }}">
+                    <button type="submit">Download PDF</button>
+                </form>
+            </div>
+            {% endif %}
+            <div id="progress-container" style="display: none;">
+                <div class="rotating-spinner"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showVideoAndSpinner() {
+            const videoUrl = document.getElementById('video_url').value;
+            const videoId = videoUrl.split('=')[1];
+            const videoFrame = document.getElementById('video-frame');
+            videoFrame.src = `https://www.youtube.com/embed/${videoId}`;
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('progress-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
